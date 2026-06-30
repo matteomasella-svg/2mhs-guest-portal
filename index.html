@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>2MHS Welcome Experience</title>
+  <style>
+    :root{
+      --bg:#08141b; --card:#10232f; --card2:#0c1b24; --text:#fff7ea; --muted:#a9bac2;
+      --teal:#079b9b; --magenta:#c52a73; --gold:#d6b36a; --ok:#64d89a; --warn:#ffd166; --bad:#ff6b6b;
+      --border:rgba(255,255,255,.14); --radius:24px; --shadow:0 28px 80px rgba(0,0,0,.36);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(circle at 18% 0%,rgba(7,155,155,.25),transparent 32%),radial-gradient(circle at 100% 12%,rgba(197,42,115,.20),transparent 30%),var(--bg);color:var(--text);min-height:100vh}
+    .wrap{width:min(1120px,94vw);margin:0 auto;padding:28px 0 56px}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
+    .brand{display:flex;align-items:center;gap:14px}.logo{width:50px;height:50px;border-radius:17px;background:linear-gradient(135deg,var(--teal),var(--magenta));display:grid;place-items:center;font-weight:900;box-shadow:var(--shadow)}
+    h1,h2,h3{margin:0}h1{font-size:28px}h2{font-size:34px;line-height:1.08}.sub,.desc{color:var(--muted);line-height:1.5}.sub{font-size:14px}.desc{font-size:15px}
+    .lang{display:flex;gap:8px;flex-wrap:wrap}.lang button,.btn{border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--text);padding:10px 15px;border-radius:999px;cursor:pointer;font-weight:750}.lang button.active,.btn.primary{background:linear-gradient(135deg,var(--teal),var(--magenta));border:0}.btn:disabled{opacity:.45;cursor:not-allowed}
+    .steps{display:flex;gap:8px;margin:18px 0 22px}.pill{height:8px;flex:1;border-radius:999px;background:rgba(255,255,255,.12)}.pill.on{background:linear-gradient(90deg,var(--teal),var(--magenta))}
+    .grid{display:grid;grid-template-columns:1.03fr .97fr;gap:18px}.card{background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04));border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px}.hero{padding:36px}
+    .field{margin:15px 0}.field label{display:block;color:var(--muted);font-size:13px;margin-bottom:7px}input,select,textarea{width:100%;background:rgba(0,0,0,.24);border:1px solid var(--border);border-radius:15px;color:var(--text);padding:13px 14px;font-size:16px}select option{color:#111}textarea{min-height:92px;resize:vertical}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}.hidden{display:none!important}.notice{border-left:4px solid var(--warn);background:rgba(255,209,102,.10);padding:12px;border-radius:14px;color:#fff3c2;margin:12px 0}.notice.ok{border-left-color:var(--ok);background:rgba(100,216,154,.10);color:#dfffee}.notice.danger{border-left-color:var(--bad);background:rgba(255,107,107,.12);color:#ffdada}
+    .booking{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}.mini{background:rgba(0,0,0,.18);border:1px solid var(--border);border-radius:16px;padding:13px}.mini b{display:block;font-size:18px}.mini span{color:var(--muted);font-size:12px}
+    .wallet{background:linear-gradient(135deg,rgba(7,155,155,.22),rgba(197,42,115,.18));border:1px solid rgba(255,255,255,.18);border-radius:21px;padding:18px;margin-top:18px}.wallet .big{font-size:42px;font-weight:900}
+    .summary-line{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08)}.summary-line span:first-child{color:var(--muted)}
+    .packgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.pack{position:relative;border:1px solid var(--border);border-radius:21px;padding:18px;background:rgba(0,0,0,.17);cursor:pointer;transition:.18s}.pack:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.30)}.pack.selected{outline:2px solid var(--teal);background:rgba(7,155,155,.13)}.pack.disabled{opacity:.42;cursor:not-allowed;filter:grayscale(.35)}
+    .icon{width:38px;height:38px;color:var(--gold);margin-bottom:9px}.icon svg{width:38px;height:38px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.credits{position:absolute;right:14px;top:14px;background:rgba(255,255,255,.10);padding:6px 10px;border-radius:999px;font-weight:900}.money{background:rgba(100,216,154,.15);border:1px solid rgba(100,216,154,.30);color:#dcffe9;padding:6px 10px;border-radius:999px;font-weight:900;display:inline-block;margin-top:8px}
+    .checks{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}.check{display:flex;gap:8px;align-items:center;background:rgba(0,0,0,.14);border:1px solid var(--border);border-radius:12px;padding:10px}.check input{width:auto}
+    .operator{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;background:#071018;border-radius:16px;padding:16px;white-space:pre-wrap;color:#d9f7f2}.footer{margin-top:24px;color:var(--muted);font-size:12px;text-align:center}
+    @media(max-width:850px){.grid,.booking,.packgrid,.checks{grid-template-columns:1fr}.hero h2{font-size:30px}.top{align-items:flex-start;flex-direction:column}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand"><div class="logo">2M</div><div><h1>2MHS Welcome Experience</h1><div class="sub" data-i="tagline"></div></div></div>
+    <div class="lang"><button data-lang="it" class="active">IT</button><button data-lang="en">EN</button><button data-lang="pt">PT</button><button data-lang="tr">TR</button></div>
+  </div>
+  <div class="steps"><div class="pill on" id="p1"></div><div class="pill" id="p2"></div><div class="pill" id="p3"></div><div class="pill" id="p4"></div></div>
+
+  <section id="step-code" class="grid">
+    <div class="card hero">
+      <h2 data-i="welcomeTitle"></h2>
+      <p class="desc" data-i="welcomeText"></p>
+      <div class="field"><label data-i="codeLabel"></label><input id="bookingCode" autocomplete="off" /></div>
+      <div class="actions"><button class="btn primary" id="loadBooking" data-i="continue"></button></div>
+      <div id="loadMsg" class="notice hidden"></div>
+    </div>
+    <div class="card">
+      <h3 data-i="privacyTitle"></h3>
+      <p class="desc" data-i="privacyText"></p>
+      <div class="notice ok" data-i="privacyNote"></div>
+    </div>
+  </section>
+
+  <section id="step-booking" class="hidden">
+    <div class="card hero">
+      <h2><span data-i="hello"></span> <span id="guestName">—</span></h2>
+      <p class="desc" id="apartment">—</p>
+      <div class="booking">
+        <div class="mini"><span>Check-in</span><b id="ci">—</b></div>
+        <div class="mini"><span>Check-out</span><b id="co">—</b></div>
+        <div class="mini"><span data-i="nights"></span><b id="nights">—</b></div>
+        <div class="mini"><span data-i="amount"></span><b id="amount">—</b></div>
+      </div>
+      <div class="wallet"><div class="sub" data-i="walletLabel"></div><div class="big"><span id="creditsTotal">0</span> Credits</div><div class="desc" data-i="walletText"></div></div>
+      <div class="actions"><button class="btn" onclick="go(1)" data-i="back"></button><button class="btn primary" onclick="go(3)" data-i="chooseBenefits"></button></div>
+    </div>
+  </section>
+
+  <section id="step-packs" class="grid hidden">
+    <div class="card">
+      <h2 data-i="chooseTitle"></h2><p class="desc" data-i="chooseText"></p>
+      <div class="wallet">
+        <div class="summary-line"><span data-i="available"></span><b><span id="walletAvailable">0</span></b></div>
+        <div class="summary-line"><span data-i="used"></span><b><span id="walletUsed">0</span></b></div>
+        <div class="summary-line"><span data-i="remaining"></span><b><span id="walletRemaining">0</span></b></div>
+        <div class="summary-line"><span data-i="extraDue"></span><b>€ <span id="extraDueValue">0</span></b></div>
+      </div>
+      <div id="packGrid" class="packgrid" style="margin-top:18px"></div>
+      <div id="packMsg" class="notice hidden"></div>
+    </div>
+    <div class="card"><h2 data-i="customize"></h2><p class="desc" data-i="customizeText"></p><div id="customFields"><p class="desc" data-i="selectFirst"></p></div><div class="actions"><button class="btn" onclick="go(2)" data-i="back"></button><button class="btn primary" id="toPrefs" data-i="continue"></button></div></div>
+  </section>
+
+  <section id="step-health" class="grid hidden">
+    <div class="card"><h2 data-i="healthTitle"></h2><p class="desc" data-i="healthText"></p><div id="allergyBox" class="checks"></div><div class="field"><label data-i="notes"></label><textarea id="notes"></textarea></div></div>
+    <div class="card"><h2 data-i="summary"></h2><div id="summaryBox"></div><div class="actions"><button class="btn" onclick="go(3)" data-i="back"></button><button class="btn primary" id="confirmBtn" data-i="confirm"></button></div></div>
+  </section>
+
+  <section id="step-done" class="hidden">
+    <div class="card hero"><h2 data-i="doneTitle"></h2><p class="desc" data-i="doneText"></p><div id="operatorCard" class="operator hidden"></div></div>
+  </section>
+
+  <div class="footer">2MHS — Hospitality System</div>
+</div>
+<script>
+const CONFIG={API_ENDPOINT:'/.netlify/functions/guest-portal'};
+const i18n={
+ it:{tagline:'Personalizza il tuo soggiorno prima dell’arrivo',welcomeTitle:'Benvenuto',welcomeText:'Inserisci il codice prenotazione ricevuto via email per accedere ai benefit disponibili per il tuo soggiorno.',codeLabel:'Codice prenotazione',continue:'Continua',privacyTitle:'La tua esperienza di benvenuto',privacyText:'Il portale mostra solo le opzioni disponibili per la tua prenotazione. Le preferenze alimentari servono a preparare correttamente il welcome pack.',privacyNote:'Puoi indicare allergie, intolleranze e preferenze essenziali prima dell’arrivo.',hello:'Ciao',nights:'Notti',amount:'Importo',walletLabel:'Welcome Credits disponibili',walletText:'Usa i crediti per scegliere i benefit inclusi. Alcuni servizi sono soggetti a conferma.',back:'Indietro',chooseBenefits:'Scegli i benefit',chooseTitle:'I tuoi benefit',chooseText:'Seleziona uno o più pack entro i crediti disponibili. Il transfer può sostituire tutti i pack oppure essere richiesto insieme a un pack con piccolo extra.',available:'Crediti disponibili',used:'Crediti utilizzati',remaining:'Crediti residui',extraDue:'Extra da pagare',customize:'Personalizzazione',customizeText:'Personalizza solo gli elementi realmente variabili. Al resto pensiamo noi.',selectFirst:'Seleziona prima un benefit.',healthTitle:'Allergie e preferenze',healthText:'Indica solo informazioni utili alla preparazione del pack.',notes:'Note',summary:'Riepilogo',confirm:'Conferma preferenze',doneTitle:'Preferenze registrate',doneText:'Grazie. Le tue preferenze sono state ricevute. Ti aspettiamo a Milano.',bookingError:'Prenotazione non trovata. Controlla il codice o contattaci.',insertCode:'Inserisci il codice prenotazione.',selectOne:'Seleziona almeno un benefit.',notEnough:'Crediti insufficienti per questa combinazione.',transferRule:'Transfer soggetto a disponibilità e conferma da parte dell’host.'},
+ en:{tagline:'Personalize your stay before arrival',welcomeTitle:'Welcome',welcomeText:'Enter the booking code received by email to access the benefits available for your stay.',codeLabel:'Booking code',continue:'Continue',privacyTitle:'Your welcome experience',privacyText:'The portal only shows the options available for your booking. Food preferences help us prepare your welcome pack correctly.',privacyNote:'You can share allergies, intolerances and essential preferences before arrival.',hello:'Hello',nights:'Nights',amount:'Amount',walletLabel:'Available Welcome Credits',walletText:'Use your credits to choose the included benefits. Some services are subject to confirmation.',back:'Back',chooseBenefits:'Choose benefits',chooseTitle:'Your benefits',chooseText:'Select one or more packs within your available credits. Transfer can replace all packs or be requested with one pack for a small extra charge.',available:'Available credits',used:'Used credits',remaining:'Remaining credits',extraDue:'Extra charge',customize:'Customization',customizeText:'Customize only the elements that really need a preference. We take care of the rest.',selectFirst:'Select a benefit first.',healthTitle:'Allergies and preferences',healthText:'Share only information useful to prepare your pack.',notes:'Notes',summary:'Summary',confirm:'Confirm preferences',doneTitle:'Preferences registered',doneText:'Thank you. Your preferences have been received. We look forward to welcoming you in Milan.',bookingError:'Booking not found. Please check the code or contact us.',insertCode:'Enter your booking code.',selectOne:'Select at least one benefit.',notEnough:'Not enough credits for this combination.',transferRule:'Transfer is subject to availability and host confirmation.'},
+ pt:{tagline:'Personalize a sua estadia antes da chegada',welcomeTitle:'Bem-vindo',welcomeText:'Insira o código de reserva recebido por email para acessar os benefícios disponíveis para a sua estadia.',codeLabel:'Código da reserva',continue:'Continuar',privacyTitle:'A sua experiência de boas-vindas',privacyText:'O portal mostra apenas as opções disponíveis para a sua reserva. As preferências alimentares ajudam-nos a preparar corretamente o welcome pack.',privacyNote:'Pode indicar alergias, intolerâncias e preferências essenciais antes da chegada.',hello:'Olá',nights:'Noites',amount:'Valor',walletLabel:'Welcome Credits disponíveis',walletText:'Use os seus créditos para escolher os benefícios incluídos. Alguns serviços estão sujeitos a confirmação.',back:'Voltar',chooseBenefits:'Escolher benefícios',chooseTitle:'Os seus benefícios',chooseText:'Selecione um ou mais packs dentro dos créditos disponíveis. O transfer pode substituir todos os packs ou ser solicitado com um pack mediante pequeno extra.',available:'Créditos disponíveis',used:'Créditos usados',remaining:'Créditos restantes',extraDue:'Extra a pagar',customize:'Personalização',customizeText:'Personalize apenas os elementos que realmente precisam de preferência. Do resto tratamos nós.',selectFirst:'Selecione primeiro um benefício.',healthTitle:'Alergias e preferências',healthText:'Indique apenas informações úteis para preparar o seu pack.',notes:'Notas',summary:'Resumo',confirm:'Confirmar preferências',doneTitle:'Preferências registradas',doneText:'Obrigado. Recebemos as suas preferências. Esperamos por si em Milão.',bookingError:'Reserva não encontrada. Verifique o código ou contacte-nos.',insertCode:'Insira o código da reserva.',selectOne:'Selecione pelo menos um benefício.',notEnough:'Créditos insuficientes para esta combinação.',transferRule:'O transfer está sujeito à disponibilidade e confirmação do anfitrião.'},
+ tr:{tagline:'Varıştan önce konaklamanızı kişiselleştirin',welcomeTitle:'Hoş geldiniz',welcomeText:'Konaklamanız için mevcut avantajlara erişmek üzere e-posta ile aldığınız rezervasyon kodunu girin.',codeLabel:'Rezervasyon kodu',continue:'Devam',privacyTitle:'Karşılama deneyiminiz',privacyText:'Portal yalnızca rezervasyonunuz için uygun seçenekleri gösterir. Yiyecek tercihleri welcome pack’in doğru hazırlanmasına yardımcı olur.',privacyNote:'Varıştan önce alerji, intolerans ve temel tercihlerinizi belirtebilirsiniz.',hello:'Merhaba',nights:'Gece',amount:'Tutar',walletLabel:'Kullanılabilir Welcome Credits',walletText:'Dahil avantajları seçmek için kredilerinizi kullanın. Bazı hizmetler onaya tabidir.',back:'Geri',chooseBenefits:'Avantajları seç',chooseTitle:'Avantajlarınız',chooseText:'Mevcut kredileriniz dahilinde bir veya daha fazla pack seçin. Transfer tüm pack’lerin yerine geçebilir veya küçük bir ek ücretle bir pack ile birlikte istenebilir.',available:'Kullanılabilir kredi',used:'Kullanılan kredi',remaining:'Kalan kredi',extraDue:'Ek ödeme',customize:'Kişiselleştirme',customizeText:'Sadece gerçekten tercih gerektiren öğeleri kişiselleştirin. Geri kalanını biz hazırlarız.',selectFirst:'Önce bir avantaj seçin.',healthTitle:'Alerjiler ve tercihler',healthText:'Pack hazırlığı için gerekli bilgileri paylaşın.',notes:'Notlar',summary:'Özet',confirm:'Tercihleri onayla',doneTitle:'Tercihler kaydedildi',doneText:'Teşekkürler. Tercihleriniz alındı. Milano’da sizi ağırlamayı bekliyoruz.',bookingError:'Rezervasyon bulunamadı. Lütfen kodu kontrol edin veya bizimle iletişime geçin.',insertCode:'Rezervasyon kodunu girin.',selectOne:'En az bir avantaj seçin.',notEnough:'Bu kombinasyon için yeterli kredi yok.',transferRule:'Transfer müsaitlik durumuna ve host onayına tabidir.'}
+};
+const packText={
+ soft:{it:{n:'Soft Drinks Pack',d:'Acqua naturale e frizzante, due bevande italiane gasate, un succo premium e un aperitivo analcolico.'},en:{n:'Soft Drinks Pack',d:'Still and sparkling water, two Italian sparkling drinks, one premium juice and one non-alcoholic aperitif.'},pt:{n:'Soft Drinks Pack',d:'Água natural e com gás, duas bebidas italianas gaseificadas, um sumo premium e um aperitivo sem álcool.'},tr:{n:'Soft Drinks Pack',d:'Doğal ve gazlı su, iki İtalyan gazlı içecek, bir premium meyve suyu ve alkolsüz aperitif.'}},
+ breakfast:{it:{n:'Breakfast Pack',d:'Latte, succo, caffè illy, tè, infusi, prodotto da forno, biscotti e spalmabile.'},en:{n:'Breakfast Pack',d:'Milk, juice, illy coffee, tea, infusions, bakery item, biscuits and spread.'},pt:{n:'Breakfast Pack',d:'Leite, sumo, café illy, chá, infusões, produto de padaria, bolachas e creme para barrar.'},tr:{n:'Breakfast Pack',d:'Süt, meyve suyu, illy kahve, çay, bitki çayı, fırın ürünü, bisküvi ve sürülebilir seçenek.'}},
+ aperitivo:{it:{n:'Italian Aperitivo Pack',d:'Bevanda principale, taralli, olive, patatine e un dolce selezionato.'},en:{n:'Italian Aperitivo Pack',d:'Main drink, taralli, olives, crisps and a selected sweet item.'},pt:{n:'Italian Aperitivo Pack',d:'Bebida principal, taralli, azeitonas, batatas fritas e um doce selecionado.'},tr:{n:'Italian Aperitivo Pack',d:'Ana içecek, taralli, zeytin, cips ve seçilmiş tatlı.'}},
+ grocery:{it:{n:'Italian Grocery Pack',d:'Ingredienti essenziali per preparare un primo pasto italiano in appartamento.'},en:{n:'Italian Grocery Pack',d:'Essential ingredients to prepare a simple Italian meal in the apartment.'},pt:{n:'Italian Grocery Pack',d:'Ingredientes essenciais para preparar uma refeição italiana simples no apartamento.'},tr:{n:'Italian Grocery Pack',d:'Dairede basit bir İtalyan yemeği hazırlamak için temel malzemeler.'}},
+ transfer_centrale:{it:{n:'Transfer da Milano Centrale',d:'Richiesta transfer dalla Stazione Centrale all’appartamento.'},en:{n:'Transfer from Milano Centrale',d:'Transfer request from Milan Central Station to the apartment.'},pt:{n:'Transfer de Milano Centrale',d:'Pedido de transfer da Estação Central de Milão para o apartamento.'},tr:{n:'Milano Centrale transferi',d:'Milano Merkez İstasyonu’ndan daireye transfer talebi.'}},
+ transfer_linate:{it:{n:'Transfer da Milano Linate',d:'Richiesta transfer dall’aeroporto di Milano Linate all’appartamento.'},en:{n:'Transfer from Milan Linate',d:'Transfer request from Milan Linate Airport to the apartment.'},pt:{n:'Transfer de Milão Linate',d:'Pedido de transfer do Aeroporto de Milão Linate para o apartamento.'},tr:{n:'Milano Linate transferi',d:'Milano Linate Havalimanı’ndan daireye transfer talebi.'}}
+};
+const icons={soft:'<svg viewBox="0 0 24 24"><path d="M8 3h8l-1 18H9L8 3Z"/><path d="M8.5 7h7"/><path d="M10 11h4"/></svg>',breakfast:'<svg viewBox="0 0 24 24"><path d="M4 10h11v4a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5v-4Z"/><path d="M15 11h2a3 3 0 0 1 0 6h-2"/><path d="M7 4v3M11 4v3"/></svg>',aperitivo:'<svg viewBox="0 0 24 24"><path d="M7 3h10l-1 7a4 4 0 0 1-8 0L7 3Z"/><path d="M12 14v6"/><path d="M8 21h8"/></svg>',grocery:'<svg viewBox="0 0 24 24"><path d="M5 8h14l-1.2 12H6.2L5 8Z"/><path d="M9 8a3 3 0 0 1 6 0"/><path d="M8 12h8"/></svg>',transfer_centrale:'<svg viewBox="0 0 24 24"><path d="M6 17h12M7 17l1-7h8l1 7"/><path d="M9 10V7h6v3"/><circle cx="8" cy="19" r="1.5"/><circle cx="16" cy="19" r="1.5"/></svg>',transfer_linate:'<svg viewBox="0 0 24 24"><path d="M3 13l18-8-7 16-3-7-8-1Z"/><path d="M11 14l10-9"/></svg>'};
+const options={
+ sparklingDrink:{it:'Bevanda gasata italiana',en:'Italian sparkling drink',pt:'Bebida italiana gaseificada',tr:'İtalyan gazlı içecek',opts:{it:['Aranciata','Limonata','Chinotto','Cedrata','Gazzosa'],en:['Orange soda','Lemon soda','Chinotto','Cedrata','Gazzosa'],pt:['Laranja gaseificada','Limão gaseificado','Chinotto','Cedrata','Gazzosa'],tr:['Portakal gazozu','Limon gazozu','Chinotto','Cedrata','Gazzosa']}},
+ juice:{it:'Succo premium',en:'Premium juice',pt:'Sumo premium',tr:'Premium meyve suyu',opts:{it:['Arancia','ACE','Mela'],en:['Orange','ACE multivitamin','Apple'],pt:['Laranja','ACE multivitaminas','Maçã'],tr:['Portakal','ACE multivitamin','Elma']}},
+ aperitifNA:{it:'Aperitivo analcolico',en:'Non-alcoholic aperitif',pt:'Aperitivo sem álcool',tr:'Alkolsüz aperitif',opts:{it:['Biondo','Rosso'],en:['Blond','Red'],pt:['Louro','Vermelho'],tr:['Sarı','Kırmızı']}},
+ milk:{it:'Tipo di latte',en:'Milk type',pt:'Tipo de leite',tr:'Süt türü',opts:{it:['Intero','Senza lattosio','Avena','Soia'],en:['Whole milk','Lactose-free','Oat','Soy'],pt:['Integral','Sem lactose','Aveia','Soja'],tr:['Tam yağlı','Laktozsuz','Yulaf','Soya']}},
+ bakery:{it:'Prodotto da forno',en:'Bakery item',pt:'Produto de padaria',tr:'Fırın ürünü',opts:{it:['Pane bianco confezionato','Pane integrale confezionato','Fette biscottate','Brioche confezionata'],en:['Packaged white bread','Packaged wholegrain bread','Toasted rusks','Packaged croissant'],pt:['Pão branco embalado','Pão integral embalado','Tostas secas','Croissant embalado'],tr:['Paketli beyaz ekmek','Paketli tam tahıllı ekmek','Kızarmış ekmek','Paketli kruvasan']}},
+ biscuits:{it:'Tipo di biscotti',en:'Biscuit type',pt:'Tipo de bolacha',tr:'Bisküvi türü',opts:{it:['Biscotti secchi classici','Biscotti con uova','Biscotti integrali'],en:['Classic dry biscuits','Egg biscuits','Wholegrain biscuits'],pt:['Bolachas secas clássicas','Bolachas com ovos','Bolachas integrais'],tr:['Klasik kuru bisküvi','Yumurtalı bisküvi','Tam tahıllı bisküvi']}},
+ spread:{it:'Spalmabile',en:'Spread',pt:'Creme para barrar',tr:'Sürülebilir ürün',opts:{it:['Marmellata','Miele','Crema alla nocciola'],en:['Jam','Honey','Hazelnut spread'],pt:['Compota','Mel','Creme de avelã'],tr:['Reçel','Bal','Fındık kreması']}},
+ drinkMain:{it:'Bevanda principale',en:'Main drink',pt:'Bebida principal',tr:'Ana içecek',opts:{it:['Prosecco','Vino bianco','Vino rosso','Birra','Analcolico'],en:['Prosecco','White wine','Red wine','Beer','Non-alcoholic'],pt:['Prosecco','Vinho branco','Vinho tinto','Cerveja','Sem álcool'],tr:['Prosecco','Beyaz şarap','Kırmızı şarap','Bira','Alkolsüz']}},
+ sweet:{it:'Dolce',en:'Sweet item',pt:'Doce',tr:'Tatlı',opts:{it:['Cioccolato','Praline','Biscotti farciti','Biscotti classici'],en:['Chocolate','Pralines','Filled biscuits','Classic biscuits'],pt:['Chocolate','Pralinés','Bolachas recheadas','Bolachas clássicas'],tr:['Çikolata','Pralin','Dolgulu bisküvi','Klasik bisküvi']}},
+ pasta:{it:'Pasta',en:'Pasta',pt:'Massa',tr:'Makarna',opts:{it:['Spaghetti','Penne'],en:['Spaghetti','Penne'],pt:['Spaghetti','Penne'],tr:['Spaghetti','Penne']}},
+ sauce:{it:'Sugo',en:'Sauce',pt:'Molho',tr:'Sos',opts:{it:['Pomodoro classico','Basilico','Arrabbiata'],en:['Classic tomato','Basil','Arrabbiata'],pt:['Tomate clássico','Manjericão','Arrabbiata'],tr:['Klasik domates','Fesleğen','Arrabbiata']}},
+ luggage:{it:'Bagagli',en:'Luggage',pt:'Bagagem',tr:'Bagaj',opts:{it:['1','2','3 o più'],en:['1','2','3 or more'],pt:['1','2','3 ou mais'],tr:['1','2','3 veya daha fazla']}}
+};
+const packs=[
+ {id:'soft',credits:35,type:'basic',fields:['sparklingDrink','sparklingDrink','juice','aperitifNA']},
+ {id:'breakfast',credits:65,type:'basic',fields:['milk','juice','bakery','biscuits','spread']},
+ {id:'aperitivo',credits:75,type:'premium',fields:['drinkMain','sweet']},
+ {id:'grocery',credits:60,type:'premium',fields:['pasta','sauce']},
+ {id:'transfer_centrale',credits:0,type:'transfer',fields:['luggage'],confirm:true},
+ {id:'transfer_linate',credits:0,type:'transfer',fields:['luggage'],confirm:true}
+];
+const allergies={it:['Nessuna','Glutine','Lattosio','Frutta a guscio','Arachidi','Uova','Soia','Vegano','Vegetariano','Altro'],en:['None','Gluten','Lactose','Tree nuts','Peanuts','Eggs','Soy','Vegan','Vegetarian','Other'],pt:['Nenhuma','Glúten','Lactose','Frutos secos','Amendoim','Ovos','Soja','Vegan','Vegetariano','Outro'],tr:['Yok','Gluten','Laktoz','Kuruyemiş','Yer fıstığı','Yumurta','Soya','Vegan','Vejetaryen','Diğer']};
+let lang='it',booking=null,selected=new Set(),prefs={};
+function tr(k){return (i18n[lang]&&i18n[lang][k])||i18n.it[k]||k}
+function translate(){document.documentElement.lang=lang;document.querySelectorAll('[data-i]').forEach(e=>e.textContent=tr(e.dataset.i));document.querySelectorAll('.lang button').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));bookingCode.placeholder=lang==='it'?'es. OMUR-20260706':lang==='en'?'e.g. OMUR-20260706':lang==='pt'?'ex. OMUR-20260706':'örn. OMUR-20260706';renderPacks();renderCustom();renderAllergies();if(booking)fillBooking(false)}
+document.querySelectorAll('.lang button').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;translate()});
+function go(n){['code','booking','packs','health','done'].forEach((id,i)=>document.getElementById('step-'+id).classList.toggle('hidden',i+1!==n));[p1,p2,p3,p4].forEach((p,i)=>p.classList.toggle('on',i<n));if(n===4)renderSummary()}
+function normalizeBooking(data){return {code:data.code||data.bookingCode||data['Booking Code'],guest:data.guest||data.guestName||[data.firstName||data['Guest First Name'],data.lastName||data['Guest Last Name']].filter(Boolean).join(' '),apartment:data.apartment||data['Apartment'],checkin:data.checkin||data['Check-in'],checkout:data.checkout||data['Check-out'],nights:Number(data.nights||data['Nights']||0),amount:Number(data.amount||data.price||data['Price EUR']||0),credits:Number(data.totalCredits||data.totalWelcomeCredits||data['Total Welcome Credits']||data.credits||data['Welcome Credits']||0),language:data.language||data['Language']||lang};}
+function creditsFor(b){if(Number.isFinite(Number(b.credits))&&Number(b.credits)>0)return Number(b.credits);let c=0,n=Number(b.nights||0);if(n>=14&&n<=29)c=75;else if(n>=30&&n<=44)c=100;else if(n>=45&&n<=59)c=130;else if(n>=60)c=175;return c}
+async function fetchBooking(code){const r=await fetch(CONFIG.API_ENDPOINT+'?code='+encodeURIComponent(code));if(!r.ok)throw new Error(tr('bookingError'));const data=await r.json();if(data.error)throw new Error(data.error);return normalizeBooking(data)}
+loadBooking.onclick=()=>load();
+async function load(){const msg=loadMsg;msg.className='notice hidden';try{const code=bookingCode.value.trim();if(!code)throw new Error(tr('insertCode'));booking=await fetchBooking(code);booking.credits=creditsFor(booking);if(['it','en','pt','tr'].includes(String(booking.language||'').toLowerCase())){lang=String(booking.language).toLowerCase();}fillBooking();translate();go(2)}catch(e){msg.textContent=e.message;msg.className='notice danger'}}
+function fmt(s){try{return new Date(s+'T00:00:00').toLocaleDateString(lang==='en'?'en-GB':lang==='pt'?'pt-PT':lang==='tr'?'tr-TR':'it-IT',{day:'2-digit',month:'short',year:'numeric'})}catch(e){return s||'—'}}
+function fillBooking(doRender=true){guestName.textContent=booking.guest||'—';apartment.textContent=booking.apartment||'—';ci.textContent=fmt(booking.checkin);co.textContent=fmt(booking.checkout);nights.textContent=booking.nights||'—';amount.textContent='€ '+Number(booking.amount||0).toFixed(2);creditsTotal.textContent=booking.credits;if(doRender)renderPacks()}
+function selectedPacks(){return [...selected].map(id=>packs.find(p=>p.id===id)).filter(Boolean)}
+function hasTransfer(){return selectedPacks().some(p=>p.type==='transfer')}
+function nonTransferPacks(){return selectedPacks().filter(p=>p.type!=='transfer')}
+function transferContribution(){if(!hasTransfer())return 0;const non=nonTransferPacks();if(!non.length)return 0;return non.some(p=>p.type==='premium')?15:10}
+function used(){const non=nonTransferPacks().reduce((s,p)=>s+p.credits,0);return hasTransfer()&&!non.length?Number(booking?.credits||0):non}
+function optionUsedAfterToggle(p){const temp=new Set(selected);if(temp.has(p.id)){temp.delete(p.id)}else{if(p.type==='transfer'){[...temp].forEach(id=>{if(packs.find(x=>x.id===id)?.type==='transfer')temp.delete(id)})}temp.add(p.id)}const old=selected;selected=temp;const val=used();selected=old;return val}
+function packName(p){return packText[p.id][lang].n}function packDesc(p){return packText[p.id][lang].d}
+function renderPacks(){if(!document.getElementById('packGrid'))return;packGrid.innerHTML='';if(!booking)return;packs.forEach(p=>{const projected=optionUsedAfterToggle(p);const disabled=!selected.has(p.id)&&projected>booking.credits;let badge=p.type==='transfer'?(selected.has(p.id)&&!nonTransferPacks().length?booking.credits:'') : p.credits;const div=document.createElement('div');div.className='pack '+(selected.has(p.id)?'selected ':'')+(disabled?'disabled':'');div.innerHTML=`${badge!==''?`<div class="credits">${badge}</div>`:''}<div class="icon">${icons[p.id]}</div><h3>${packName(p)}</h3><p class="desc">${packDesc(p)}</p>${p.confirm?`<div class="notice">${tr('transferRule')}</div>`:''}${p.type==='transfer'&&selected.has(p.id)&&transferContribution()>0?`<div class="money">${tr('extraDue')}: €${transferContribution()}</div>`:''}`;div.onclick=()=>{if(disabled){packMsg.textContent=tr('notEnough');packMsg.className='notice danger';return}if(selected.has(p.id)){selected.delete(p.id)}else{if(p.type==='transfer'){[...selected].forEach(id=>{if(packs.find(x=>x.id===id)?.type==='transfer')selected.delete(id)})}selected.add(p.id)}packMsg.className='notice hidden';renderPacks();renderCustom()};packGrid.appendChild(div)});walletAvailable.textContent=booking.credits;walletUsed.textContent=used();walletRemaining.textContent=booking.credits-used();extraDueValue.textContent=transferContribution();if(hasTransfer()){packMsg.textContent=tr('transferRule');packMsg.className='notice'}}
+function renderCustom(){if(!document.getElementById('customFields'))return;customFields.innerHTML='';if(!selected.size){customFields.innerHTML=`<p class="desc">${tr('selectFirst')}</p>`;return}[...selected].forEach(id=>{const p=packs.find(x=>x.id===id);const box=document.createElement('div');box.innerHTML=`<h3>${packName(p)}</h3>`;p.fields.forEach((fieldKey,index)=>{const meta=options[fieldKey];const fid=`${id}__${fieldKey}__${index}`;const f=document.createElement('div');f.className='field';f.innerHTML=`<label>${meta[lang]}</label><select id="${fid}">${meta.opts[lang].map(o=>`<option>${o}</option>`).join('')}</select>`;box.appendChild(f);setTimeout(()=>{const el=document.getElementById(fid);if(el){prefs[fid]=el.value;el.onchange=()=>prefs[fid]=el.value}},0)});customFields.appendChild(box)})}
+toPrefs.onclick=()=>{if(!selected.size){packMsg.textContent=tr('selectOne');packMsg.className='notice danger';return}go(4)};
+function renderAllergies(){if(!document.getElementById('allergyBox'))return;allergyBox.innerHTML=allergies[lang].map(a=>`<label class="check"><input type="checkbox" value="${a}"> ${a}</label>`).join('')}
+function renderSummary(){const sel=selectedPacks();summaryBox.innerHTML=`<div class="summary-line"><span>${tr('hello')}</span><b>${booking.guest}</b></div><div class="summary-line"><span>Credits</span><b>${used()} / ${booking.credits}</b></div><div class="summary-line"><span>${tr('extraDue')}</span><b>€ ${transferContribution()}</b></div>`+sel.map(p=>`<div class="summary-line"><span>${packName(p)}</span><b>${p.type==='transfer'?(transferContribution()?'+€'+transferContribution():booking.credits):p.credits}</b></div>`).join('')}
+confirmBtn.onclick=async()=>{const allergiesSel=[...allergyBox.querySelectorAll('input:checked')].map(x=>x.value);const payload={bookingCode:booking.code,booking,selected:selectedPacks().map(p=>({id:p.id,name:packName(p),credits:p.type==='transfer'?(transferContribution()?0:booking.credits):p.credits,extraDue:transferContribution()})),extraDue:transferContribution(),preferences:prefs,allergies:allergiesSel,notes:notes.value,language:lang,timestamp:new Date().toISOString()};localStorage.setItem('2mhs_last_welcome',JSON.stringify(payload));try{await fetch(CONFIG.API_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})}catch(e){console.warn(e)}go(5)};
+translate();const q=new URLSearchParams(location.search);if(q.get('booking')){bookingCode.value=q.get('booking');load()}
+</script>
+</body>
+</html>
