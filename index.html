@@ -16,6 +16,25 @@
 
     .compact-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.compact-chip{display:flex;align-items:center;gap:7px;min-height:42px;border:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.12);border-radius:14px;padding:8px 9px;font-size:12px;color:var(--text)}.compact-chip svg{width:16px;height:16px;stroke:var(--cream);stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}.success-box{border-left:4px solid var(--ok);background:rgba(104,216,155,.13);color:#e9fff2;border-radius:14px;padding:14px;margin:14px 0;font-weight:850}.side .catalog-section{margin:12px 0}.side .summary-line{padding:8px 0}.side .catalog-pack{margin:7px 0}.side .catalog-pack-head p{display:none}.host-note{font-size:12px;color:var(--muted);margin-top:8px}
 
+
+/* v9 layout fix: balanced pack cards and compact previews */
+.packgrid{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))!important;align-items:stretch}
+.pack{display:flex;flex-direction:column;min-height:0}
+.pack-media{height:92px!important;flex:0 0 auto}
+.pack-body{display:flex;flex-direction:column;gap:8px;min-height:0}
+.pack-title{align-items:flex-start!important}
+.pack-title h3{font-size:16px;line-height:1.15}
+.pack-title .desc{font-size:12px}
+.pack-body>.desc{font-size:13px;line-height:1.35;margin:0}
+.pack-products-preview{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:auto}
+.preview-item{display:flex;align-items:center;gap:6px;min-width:0;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:rgba(255,255,255,.055);padding:7px;font-size:11px;color:var(--muted)}
+.preview-item svg{width:14px;height:14px;stroke:var(--cream);stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.preview-item span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#step-packs .card:first-child{padding:20px}
+#step-packs .wallet{margin-top:14px}
+@media(min-width:1180px){.layout{grid-template-columns:minmax(0,1fr) 340px}.packgrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:760px){.packgrid{grid-template-columns:1fr!important}.pack-media{height:105px!important}.pack-products-preview{grid-template-columns:1fr}}
+
     @media(max-width:980px){.layout{grid-template-columns:1fr}.side{position:static}.grid{grid-template-columns:1fr}.booking,.packgrid,.checks{grid-template-columns:1fr}.hero h2{font-size:32px}.top{flex-direction:column}.lang{justify-content:flex-start}}
   </style>
 </head>
@@ -195,7 +214,8 @@ toPrefs.onclick=async()=>{
     if(!r.ok||data.ok===false)throw new Error(data.error||tr('saveError'));
     localStorage.setItem('2mhs_last_welcome',JSON.stringify(payload));
     operatorCard.textContent=operatorText(payload);
-    doneTitle.textContent=tr('doneTitle');
+    const doneTitleEl=document.querySelector('#step-done [data-i="doneTitle"]');
+    if(doneTitleEl) doneTitleEl.textContent=tr('doneTitle');
     document.querySelector('#step-done .success-box').textContent=tr('saveSuccess');
     document.querySelector('#step-done .desc').textContent=tr('doneText');
     go(5);
