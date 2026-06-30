@@ -50,8 +50,8 @@ const packs=[
  {id:'breakfast',icon:'◦',name:'Breakfast Welcome',credits:65,desc:'Latte, succo/spremuta, illy, tè, prodotto da forno, biscotti e spalmabile.',fields:[['Latte',['Intero','Senza lattosio','Avena','Soia']],['Succo',['Arancia','ACE','Mela']],['Prodotto da forno',['Pane bianco confezionato','Pane integrale confezionato','Fette biscottate','Brioche confezionate']],['Biscotti',['Biscotti secchi classici','Biscotti con uova','Biscotti integrali']],['Spalmabile',['Marmellata','Miele','Crema cacao/nocciola']]]},
  {id:'aperitivo',icon:'◦',name:'Italian Aperitivo',credits:75,desc:'Bevanda principale, taralli, olive, patatine e dolce.',fields:[['Bevanda',['Prosecco DOC 37,5 cl','Vino bianco DOC 37,5 cl','Vino rosso DOCG 37,5 cl','Birra italiana 33 cl','Aperitivo analcolico']],['Dolce',['Cioccolato','Praline','Biscotti al cacao','Biscotti classici']]]},
  {id:'grocery',icon:'◦',name:'Italian Grocery',credits:60,desc:'Pasta, sugo, Parmigiano, olio EVO, sale, pepe e taralli.',fields:[['Pasta',['Spaghetti','Penne rigate']],['Sugo',['Pomodoro classico','Basilico','Arrabbiata','Pesto']]]},
- {id:'transfer_centrale',icon:'◦',name:'Transfer Milano Centrale',credits:150,desc:'Trasferimento da Milano Centrale all’appartamento. Soggetto a conferma.',fields:[['Orario arrivo',['Da indicare nelle note']],['Bagagli',['1','2','3+']]],confirm:true},
- {id:'transfer_linate',icon:'◦',name:'Transfer Milano Linate',credits:175,desc:'Trasferimento da Milano Linate all’appartamento. Soggetto a conferma.',fields:[['Orario arrivo',['Da indicare nelle note']],['Bagagli',['1','2','3+']]],confirm:true}
+ {id:'transfer_centrale',icon:'◦',name:'Transfer Milano Centrale',credits:100,desc:'Trasferimento da Milano Centrale all’appartamento. Soggetto a conferma.',fields:[['Orario arrivo',['Da indicare nelle note']],['Bagagli',['1','2','3+']]],confirm:true},
+ {id:'transfer_linate',icon:'◦',name:'Transfer Milano Linate',credits:100,desc:'Trasferimento da Milano Linate all’appartamento. Soggetto a conferma.',fields:[['Orario arrivo',['Da indicare nelle note']],['Bagagli',['1','2','3+']]],confirm:true}
 ];
 const allergies=['Nessuna','Glutine','Lattosio','Frutta a guscio','Arachidi','Uova','Soia','Vegano','Vegetariano','Altro'];
 function applyLang(){document.querySelectorAll('[data-i]').forEach(e=>e.textContent=(i18n[lang][e.dataset.i]||e.textContent));document.querySelectorAll('.lang button').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));}
@@ -69,7 +69,42 @@ function renderCustom(){customFields.innerHTML=''; if(!selected.size){customFiel
 toPrefs.onclick=()=>{if(!selected.size){packMsg.textContent=lang==='it'?'Seleziona almeno un benefit.':'Select at least one benefit.'; packMsg.className='notice danger';return;} go(4)};
 function renderAllergies(){allergyBox.innerHTML=allergies.map(a=>`<label class="check"><input type="checkbox" value="${a}"> ${a}</label>`).join('')} renderAllergies();
 function renderSummary(){const sel=[...selected].map(id=>packs.find(p=>p.id===id)); summaryBox.innerHTML=`<div class="summary-line"><span>Ospite</span><b>${booking.guest}</b></div><div class="summary-line"><span>Crediti</span><b>${used()} / ${booking.credits}</b></div>`+sel.map(p=>`<div class="summary-line"><span>${p.name}</span><b>${p.credits}</b></div>`).join('');}
-confirmBtn.onclick=async()=>{const allergiesSel=[...allergyBox.querySelectorAll('input:checked')].map(x=>x.value); const payload={action:'savePreferences',bookingCode:booking.code,language:lang,allergies:allergiesSel.join(', '),dietaryNotes:notes.value,selectedPack:[...selected].join(', '),packCredits:used(),remainingCredits:(booking.credits||0)-used(),preferences:prefs,notes:notes.value}; localStorage.setItem('2mhs_last_welcome',JSON.stringify(payload)); try{await fetch(CONFIG.API_ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});}catch(e){console.warn(e)} operatorCard.textContent=operatorText(payload,allergiesSel); go(5);};
+confirmBtn.onclick=async()=>{
+  const allergiesSel=[...allergyBox.querySelectorAll('input:checked')].map(x=>x.value);
+  const payload={
+    action:'savePreferences',
+    booking:{
+      bookingCode:booking.code,
+      guest:booking.guest,
+      apartment:booking.apartment,
+      checkIn:booking.checkin,
+      checkOut:booking.checkout,
+      totalWelcomeCredits:booking.credits
+    },
+    selected:[...selected],
+    preferences:prefs,
+    allergies:allergiesSel,
+    creditsUsed:used(),
+    passengers:1,
+    bags:'',
+    transferRequested:[...selected].some(x=>x.includes('transfer')),
+    notes:notes.value
+  };
+  localStorage.setItem('2mhs_last_welcome',JSON.stringify(payload));
+  const msg=document.getElementById('saveMsg');
+  msg.className='notice hidden';
+  try{
+    const res=await fetch(CONFIG.API_ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+    const data=await res.json();
+    if(!data.ok) throw new Error(data.error||'Save failed');
+    operatorCard.textContent=operatorText(payload,allergiesSel);
+    go(5);
+  }catch(e){
+    msg.textContent=lang==='it'?'Errore nel salvataggio. Riprova o contattaci.':'Save error. Please try again or contact us.';
+    msg.className='notice danger';
+    console.warn(e);
+  }
+};
 function operatorText(p,allergiesSel){return `SCHEDA OPERATIVA 2MHS\n\nOspite: ${booking.guest}\nAlloggio: ${booking.apartment}\nCheck-in: ${fmt(booking.checkin)}\nCheck-out: ${fmt(booking.checkout)}\nNotti: ${booking.nights}\nCrediti: ${used()} / ${booking.credits}\n\nBenefit scelti:\n${[...selected].map(id=>'- '+packs.find(x=>x.id===id).name).join('\n')}\n\nPreferenze:\n${Object.entries(prefs).map(([k,v])=>'- '+k.replaceAll('__',' / ')+': '+v).join('\n')}\n\nAllergie/preferenze alimentari: ${allergiesSel.join(', ')||'Nessuna'}\nNote: ${notes.value||'-'}\n\nTransfer: ${[...selected].some(id=>id.includes('transfer'))?'Richiesto - da confermare':'No'}\n\nPreparato: no`;}
 const q=new URLSearchParams(location.search); if(q.get('booking')){bookingCode.value=q.get('booking'); load();}
 </script>
