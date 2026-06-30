@@ -36,7 +36,7 @@
 @media(max-width:760px){.packgrid{grid-template-columns:1fr!important}.pack-media{height:105px!important}.pack-products-preview{grid-template-columns:1fr}}
 
     @media(max-width:980px){.layout{grid-template-columns:1fr}.side{position:static}.grid{grid-template-columns:1fr}.booking,.packgrid,.checks{grid-template-columns:1fr}.hero h2{font-size:32px}.top{flex-direction:column}.lang{justify-content:flex-start}}
-  </style>
+  .host-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}.host-table{overflow:auto;max-height:460px}.host-table table{width:100%;border-collapse:collapse;font-size:12px}.host-table th,.host-table td{border-bottom:1px solid rgba(255,255,255,.08);padding:9px 8px;text-align:left;vertical-align:top}.host-table th{color:var(--muted);font-weight:800}.host-table tr:hover td{background:rgba(255,255,255,.035)}@media(max-width:850px){.host-grid{grid-template-columns:1fr}}</style>
 </head>
 <body>
 <div class="wrap">
@@ -75,6 +75,21 @@
       <div id="sideContent"></div>
     </aside>
   </div>
+      <section id="step-host" class="hidden">
+        <div class="card hero">
+          <h2>Host Dashboard</h2>
+          <p class="desc">Riepilogo operativo 2MHS: arrivi, preferenze ospiti, pack da preparare e prodotti/magazzino.</p>
+          <div id="hostMsg" class="notice hidden"></div>
+          <div id="hostSummary" class="booking"></div>
+        </div>
+        <div class="host-grid">
+          <div class="card"><h3>Prossimi soggiorni</h3><div id="hostBookings" class="host-table"></div></div>
+          <div class="card"><h3>Pack e preferenze ricevute</h3><div id="hostPreferences" class="host-table"></div></div>
+          <div class="card"><h3>Operazioni da preparare</h3><div id="hostOperations" class="host-table"></div></div>
+          <div class="card"><h3>Prodotti / magazzino</h3><div id="hostProducts" class="host-table"></div></div>
+        </div>
+      </section>
+
   <div class="footer">2MHS - 2M Hospitality System</div>
 </div>
 
@@ -109,9 +124,10 @@ const tr=(k)=>T[lang][k]||k, lx=()=>L[lang];
 function applyLang(){document.documentElement.lang=lang;document.querySelectorAll('[data-i]').forEach(e=>e.textContent=tr(e.dataset.i));document.querySelectorAll('[data-placeholder-key]').forEach(e=>e.placeholder=tr(e.dataset.placeholderKey));document.querySelectorAll('.lang button').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));renderAllergies();renderPacks();renderCustom();renderSidebar();if(booking)fillBooking(false);}
 document.querySelectorAll('.lang button').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;applyLang()});applyLang();
 function normalizeBooking(api){const b=api&&api.booking?api.booking:api;const first=b.firstName||b.guestFirstName||'';const last=b.lastName||b.guestLastName||'';const total=Number(b.totalWelcomeCredits);const base=Number(b.welcomeCredits||0);const extra=Number(b.hostExtraCredits||0);return{code:b.bookingCode||b.code||'',guest:(b.guest||`${first} ${last}`).trim(),apartment:b.apartment||'',checkin:b.checkIn||b.checkin||'',checkout:b.checkOut||b.checkout||'',nights:Number(b.nights||0),amount:Number(b.price||b.amount||0),payment:b.paymentMode||b.payment||'',language:b.language||'en',credits:Number.isFinite(total)&&total>0?total:(base+extra),status:b.status||''};}
-async function fetchBooking(code){const r=await fetch(CONFIG.API_ENDPOINT+'?action=getBooking&code='+encodeURIComponent(code));const data=await r.json();if(!data.ok||!data.booking)throw new Error(tr('bookingNotFound'));return normalizeBooking(data);}
+async function fetchJson(url, options){const r=await fetch(url, options);const text=await r.text();try{return JSON.parse(text);}catch(e){throw new Error('Risposta non JSON dal server. Controlla endpoint/deploy Apps Script.');}}
+async function fetchBooking(code){const data=await fetchJson(CONFIG.API_ENDPOINT+'?action=getBooking&code='+encodeURIComponent(code));if(!data.ok||!data.booking)throw new Error(tr('bookingNotFound'));return normalizeBooking(data);}
 loadBooking.onclick=()=>load();
-async function load(){loadMsg.className='notice hidden';try{const code=bookingCode.value.trim();if(!code)throw new Error(tr('enterCode'));booking=await fetchBooking(code);if(booking.language&&T[booking.language])lang=booking.language;applyLang();fillBooking();go(3);}catch(e){loadMsg.textContent=e.message;loadMsg.className='notice danger';}}
+async function load(){loadMsg.className='notice hidden';try{const code=bookingCode.value.trim();if(!code)throw new Error(tr('enterCode'));if(code.toUpperCase()==='HOST3671'){await loadHostDashboard(code);return;}booking=await fetchBooking(code);if(booking.language&&T[booking.language])lang=booking.language;applyLang();fillBooking();go(3);}catch(e){loadMsg.textContent=e.message;loadMsg.className='notice danger';}}
 function fillBooking(render=true){guestName.textContent=booking.guest||'-';apartment.textContent=booking.apartment||'-';ci.textContent=fmt(booking.checkin);co.textContent=fmt(booking.checkout);nights.textContent=booking.nights||'-';amount.textContent=booking.amount?'€ '+booking.amount.toFixed(2):'-';creditsTotal.textContent=booking.credits||0;if(window.healthCreditsTotal)healthCreditsTotal.textContent=booking.credits||0;if(window.healthStay)healthStay.textContent=(booking.apartment||'-')+' · '+fmt(booking.checkin);if(render){renderPacks();renderSidebar();}updateWallet();}
 function fmt(s){if(!s)return '-';return new Date(s+'T00:00:00').toLocaleDateString(lang==='en'?'en-GB':lang==='pt'?'pt-PT':lang==='tr'?'tr-TR':'it-IT',{day:'2-digit',month:'short',year:'numeric'});}
 function go(n){currentStep=n;['code','booking','health','packs','done'].forEach((id,i)=>document.getElementById('step-'+id).classList.toggle('hidden',i+1!==n));[p1,p2,p3,p4].forEach((p,i)=>p.classList.toggle('on',i<n));renderSidebar();if(n===4){renderPacks();renderCustom();updateWallet();}window.scrollTo({top:0,behavior:'smooth'});}
@@ -210,7 +226,7 @@ toPrefs.onclick=async()=>{
       signal:controller.signal
     });
     clearTimeout(timeout);
-    const data=await r.json().catch(()=>({ok:r.ok}));
+    const text=await r.text();let data;try{data=JSON.parse(text);}catch(e){throw new Error('Risposta non JSON dal server. Controlla endpoint/deploy Apps Script.');}
     if(!r.ok||data.ok===false)throw new Error(data.error||tr('saveError'));
     localStorage.setItem('2mhs_last_welcome',JSON.stringify(payload));
     operatorCard.textContent=operatorText(payload);
@@ -229,6 +245,37 @@ toPrefs.onclick=async()=>{
   }
 };
 function operatorText(p){return`2MHS OPERATION CARD\n\nGuest: ${booking.guest}\nApartment: ${booking.apartment}\nCheck-in: ${fmt(booking.checkin)}\nCheck-out: ${fmt(booking.checkout)}\nNights: ${booking.nights}\nCredits: ${used()} / ${booking.credits} · Remaining: ${Math.max((booking.credits||0)-used(),0)}\n\nSelected benefits:\n${[...selected].map(id=>'- '+lx().packs[id].name).join('\n')}\n\nPreferences:\n${Object.entries(p.preferences).map(([k,v])=>'- '+k+': '+v).join('\n')||'-'}\n\nAllergies / dietary preferences: ${p.allergies.join(', ')||lx().allergies.none}\nNotes: ${notes.value||'-'}\n\nTransfer: ${p.transferRequested?'Requested - to confirm':'No'}\n\n${tr('prepared')}`;}
+
+async function loadHostDashboard(code){
+  go(6);
+  hostMsg.textContent='Caricamento dashboard host...';
+  hostMsg.className='notice';
+  try{
+    const data=await fetchJson(CONFIG.API_ENDPOINT+'?action=getHostDashboard&hostCode='+encodeURIComponent(code));
+    if(!data.ok) throw new Error(data.error||'Host dashboard non disponibile');
+    renderHostDashboard(data);
+    hostMsg.textContent='Dashboard aggiornata.';
+    hostMsg.className='notice ok';
+  }catch(e){
+    hostMsg.textContent=e.message;
+    hostMsg.className='notice danger';
+  }
+}
+function esc(v){return String(v??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+function renderHostDashboard(data){
+  const s=data.summary||{};
+  hostSummary.innerHTML=`<div class="mini"><span>Arrivi prossimi</span><b>${s.upcomingBookings||0}</b></div><div class="mini"><span>Preferenze ricevute</span><b>${s.submittedPreferences||0}</b></div><div class="mini"><span>Operazioni aperte</span><b>${s.openOperations||0}</b></div><div class="mini"><span>Prodotti</span><b>${s.products||0}</b></div>`;
+  hostBookings.innerHTML=table(data.bookings||[],['checkIn','checkOut','guestName','apartment','bookingCode','nights','totalCredits']);
+  hostPreferences.innerHTML=table(data.preferences||[],['checkIn','guestName','apartment','pack','allergies','customizations','creditsUsed','remainingCredits','transferRequested']);
+  hostOperations.innerHTML=table(data.operations||[],['checkIn','guestName','apartment','pack','customizations','allergies','credits','status','delivered']);
+  hostProducts.innerHTML=table(data.products||[],['packCategory','productName','brand','size','qty','availability','substitute']);
+}
+function table(rows, cols){
+  if(!rows.length) return '<p class="desc">Nessun dato disponibile.</p>';
+  return '<table><thead><tr>'+cols.map(c=>'<th>'+esc(label(c))+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+cols.map(c=>'<td>'+esc(r[c])+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
+}
+function label(k){return {checkIn:'Check-in',checkOut:'Check-out',guestName:'Ospite',apartment:'Alloggio',bookingCode:'Codice',nights:'Notti',totalCredits:'Crediti',pack:'Pack',allergies:'Allergie',customizations:'Preferenze',creditsUsed:'Usati',remainingCredits:'Residui',transferRequested:'Transfer',credits:'Crediti',status:'Status',delivered:'Consegnato',packCategory:'Pack',productName:'Prodotto',brand:'Brand',size:'Formato',qty:'Qtà',availability:'Disponibilità',substitute:'Sostituto'}[k]||k;}
+
 const q=new URLSearchParams(location.search);if(q.get('booking')){bookingCode.value=q.get('booking');load();}
 </script>
 </body>
