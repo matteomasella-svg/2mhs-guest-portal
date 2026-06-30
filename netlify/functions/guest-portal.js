@@ -1,28 +1,76 @@
-exports.handler = async function(event) {
-  const endpoint = process.env.APPS_SCRIPT_ENDPOINT;
-  if (!endpoint) {
-    return json(500, { ok:false, error:'Missing APPS_SCRIPT_ENDPOINT' });
+const https = require("https");
+
+const APPS_SCRIPT_ENDPOINT =
+  "https://script.google.com/macros/s/AKfycbzfelg-0p1xuHhSINGBPKHveYEtuJu6pruflAeElV0ezHZBrWDDM7622YdDbyc_i6Xh/exec";
+
+function requestUrl(url) {
+  return new Promise((resolve, reject) => {
+    https
+      .get(url, (res) => {
+        let data = "";
+
+        res.on("data", (chunk) => {
+          data += chunk;
+        });
+
+        res.on("end", () => {
+          resolve({
+            statusCode: res.statusCode,
+            body: data,
+          });
+        });
+      })
+      .on("error", reject);
+  });
+}
+
+exports.handler = async function (event) {
+  if (event.httpMethod === "OPTIONS") {
+    return {
+      statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+      },
+      body: "",
+    };
   }
+
   try {
-    if (event.httpMethod === 'GET') {
-      const qs = event.rawQuery ? '?' + event.rawQuery : '';
-      const r = await fetch(endpoint + qs);
-      const text = await r.text();
-      return { statusCode: 200, headers: cors(), body: text };
-    }
-    if (event.httpMethod === 'POST') {
-      const r = await fetch(endpoint, {
-        method:'POST',
-        headers:{ 'content-type':'application/json' },
-        body:event.body || '{}'
-      });
-      const text = await r.text();
-      return { statusCode: 200, headers: cors(), body: text };
-    }
-    return json(405, { ok:false, error:'Method not allowed' });
-  } catch (e) {
-    return json(500, { ok:false, error:String(e.message || e) });
+    const params = event.queryStringParameters || {};
+    const action = params.action || "getBooking";
+    const code = params.code || params.booking || "";
+
+    const url =
+      APPS_SCRIPT_ENDPOINT +
+      "?action=" +
+      encodeURIComponent(action) +
+      "&code=" +
+      encodeURIComponent(code);
+
+    const result = await requestUrl(url);
+
+    return {
+      statusCode: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: result.body,
+    };
+  } catch (err) {
+    return {
+      statusCode: 500,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify({
+        ok: false,
+        error: "Netlify function error",
+        details: err.message,
+      }),
+    };
   }
 };
-function cors(){return {'content-type':'application/json; charset=utf-8','access-control-allow-origin':'*','access-control-allow-methods':'GET,POST,OPTIONS','access-control-allow-headers':'content-type'};}
-function json(statusCode, body){return {statusCode, headers:cors(), body:JSON.stringify(body)};}
