@@ -112,6 +112,16 @@ function renderSidebar(){
   const available=PACKS.filter(p=>!selected.has(p.id)).map(p=>packGroup(p,false)).join('');
   sideContent.innerHTML=`<div class="catalog-section"><div class="catalog-title">${tr('included')}</div>${essentials}</div><div class="catalog-section"><div class="catalog-title">${tr('selected')}</div>${chosen}</div><div class="catalog-section"><div class="catalog-title">${tr('availablePacks')}</div>${available}</div>`;
 }
+
+toPrefs.onclick=()=>{
+  packMsg.className='notice hidden';
+  if(!selected.size){
+    packMsg.textContent=tr('selectAtLeast');
+    packMsg.className='notice danger';
+    return;
+  }
+  go(4);
+};
 function localizedPrefs(){const out={};Object.entries(prefs).forEach(([k,v])=>{const [packId,fieldKey]=k.split('__');const label=(lx().packs[packId]?.name||packId)+' / '+(lx().fields[fieldKey]||fieldKey);out[label]=lx().options[v]||v;});return out;}
 confirmBtn.onclick=async()=>{const msg=saveMsg;msg.className='notice hidden';const allergyKeys=[...allergyBox.querySelectorAll('input:checked')].map(x=>x.value);const payload={action:'savePreferences',booking:{bookingCode:booking.code,guest:booking.guest,apartment:booking.apartment,checkIn:booking.checkin,checkOut:booking.checkout,totalWelcomeCredits:booking.credits},selected:[...selected],preferences:localizedPrefs(),allergies:allergyKeys.map(k=>lx().allergies[k]),creditsUsed:used(),passengers:1,bags:'',transferRequested:[...selected].some(x=>x.includes('transfer')),notes:notes.value};try{const r=await fetch(CONFIG.API_ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});const data=await r.json().catch(()=>({ok:true}));if(data.ok===false)throw new Error(data.error||tr('saveError'));localStorage.setItem('2mhs_last_welcome',JSON.stringify(payload));operatorCard.textContent=operatorText(payload);go(5);}catch(e){msg.textContent=e.message||tr('saveError');msg.className='notice danger';}};
 function operatorText(p){return`2MHS OPERATION CARD\n\nGuest: ${booking.guest}\nApartment: ${booking.apartment}\nCheck-in: ${fmt(booking.checkin)}\nCheck-out: ${fmt(booking.checkout)}\nNights: ${booking.nights}\nCredits: ${used()} / ${booking.credits}\n\nSelected benefits:\n${[...selected].map(id=>'- '+lx().packs[id].name).join('\n')}\n\nPreferences:\n${Object.entries(p.preferences).map(([k,v])=>'- '+k+': '+v).join('\n')||'-'}\n\nAllergies / dietary preferences: ${p.allergies.join(', ')||lx().allergies.none}\nNotes: ${notes.value||'-'}\n\nTransfer: ${p.transferRequested?'Requested - to confirm':'No'}\n\n${tr('prepared')}`;}
